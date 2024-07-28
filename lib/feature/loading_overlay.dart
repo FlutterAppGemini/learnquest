@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:learnquest/common/extension/custom_theme_extension.dart';
 
 class LoadingOverlay extends StatefulWidget {
   final bool isLoading;
@@ -45,7 +46,7 @@ class _LoadingOverlayState extends State<LoadingOverlay> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  'assets/Logo.png',
+                  "assets/images/logo.png",
                   width: 100,
                   height: 100,
                 ),

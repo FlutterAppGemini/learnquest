@@ -1,9 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:learnquest/common/routes/routes.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:learnquest/common/services/auth_google.dart';
-import 'package:learnquest/feature/home/page/home_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthPage extends StatelessWidget {
@@ -48,7 +46,7 @@ class AuthPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/Logo.png', width: 150, height: 150),
+            Image.asset("assets/images/logo.png", width: 150, height: 150),
             const SizedBox(height: 40),
             ElevatedButton(
               onPressed: () => _enterAsGuest(context),

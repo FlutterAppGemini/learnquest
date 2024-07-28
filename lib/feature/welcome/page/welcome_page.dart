@@ -14,19 +14,19 @@ class _WelcomePageState extends State<WelcomePage> {
 
   final List<Map<String, String>> _pages = [
     {
-      'image': 'assets/welcome1.png',
+      'image': 'assets/images/welcome1.png',
       'title': 'Bienvenido a LearnQuest',
       'text':
           'Descubre un mundo de aprendizaje personalizado. Genera rutas de estudio adaptadas a tus objetivos y preferencias.',
     },
     {
-      'image': 'assets/welcome2.png',
+      'image': 'assets/images/welcome2.png',
       'title': 'Explora y Aprende',
       'text':
           'Navega a través de un mapa interactivo, completa niveles y desbloquea mundos de conocimiento. Aprende jugando y diviértete.',
     },
     {
-      'image': 'assets/welcome3.png',
+      'image': 'assets/images/welcome3.png',
       'title': 'Personaliza y Conecta',
       'text':
           'Ajusta tu ruta de aprendizaje según tus necesidades. Únete a una comunidad de aprendices y comparte tus progresos.',
@@ -71,7 +71,7 @@ class _WelcomePageState extends State<WelcomePage> {
                           height: MediaQuery.of(context).size.height / 2,
                           decoration: const BoxDecoration(
                             image: DecorationImage(
-                              image: AssetImage("assets/background.png"),
+                              image: AssetImage("assets/images/background.png"),
                               fit: BoxFit.cover,
                               alignment: Alignment.topCenter,
                             ),

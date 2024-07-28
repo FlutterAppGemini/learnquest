@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:learnquest/common/extension/custom_theme_extension.dart';
 import 'package:learnquest/common/routes/routes.dart';
-import 'package:learnquest/feature/home/page/home_page.dart';
 import 'dart:async';
-import 'package:learnquest/feature/welcome/page/welcome_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -79,7 +76,7 @@ class _SplashScreenState extends State<SplashScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/Logo.png', width: 100, height: 100),
+              Image.asset('assets/images/logo.png', width: 100, height: 100),
               const SizedBox(height: 20),
               FadeTransition(
                 opacity: _textOpacity!,
