@@ -1,5 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:learnquest/common/routes/routes.dart';
+import 'package:learnquest/feature/welcome/components/animated_page_dragger.dart';
+import 'package:learnquest/feature/welcome/components/page_dragger.dart';
+import 'package:learnquest/feature/welcome/components/page_indicator.dart';
+import 'package:learnquest/feature/welcome/components/page_reveal.dart';
+import 'package:learnquest/feature/welcome/enum/slide_direction.dart';
+import 'package:learnquest/feature/welcome/enum/transition_goal.dart';
+import 'package:learnquest/feature/welcome/enum/update_type.dart';
+import 'package:learnquest/feature/welcome/models/page_indicator_view_model.dart';
+import 'dart:async';
+
+import 'package:learnquest/feature/welcome/models/page_view_model.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -8,187 +19,206 @@ class WelcomePage extends StatefulWidget {
   State<WelcomePage> createState() => _WelcomePageState();
 }
 
-class _WelcomePageState extends State<WelcomePage> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
+class _WelcomePageState extends State<WelcomePage>
+    with TickerProviderStateMixin {
+  late StreamController<SlideUpdate> slideUpdateStream;
+  late AnimatedPageDragger animatedPageDragger;
 
-  final List<Map<String, String>> _pages = [
-    {
-      'image': 'assets/images/welcome1.png',
-      'title': 'Bienvenido a LearnQuest',
-      'text':
-          'Descubre un mundo de aprendizaje personalizado. Genera rutas de estudio adaptadas a tus objetivos y preferencias.',
-    },
-    {
-      'image': 'assets/images/welcome2.png',
-      'title': 'Explora y Aprende',
-      'text':
-          'Navega a través de un mapa interactivo, completa niveles y desbloquea mundos de conocimiento. Aprende jugando y diviértete.',
-    },
-    {
-      'image': 'assets/images/welcome3.png',
-      'title': 'Personaliza y Conecta',
-      'text':
-          'Ajusta tu ruta de aprendizaje según tus necesidades. Únete a una comunidad de aprendices y comparte tus progresos.',
-    },
-  ];
+  int activeIndex = 0;
+  SlideDirection slideDirection = SlideDirection.none;
+  int nextPageIndex = 0;
+  double slidePercent = 0.0;
 
-  void _onPageChanged(int index) {
-    setState(() {
-      _currentPage = index;
+  @override
+  void initState() {
+    super.initState();
+    slideUpdateStream = StreamController<SlideUpdate>();
+
+    slideUpdateStream.stream.listen((SlideUpdate event) {
+      setState(() {
+        if (event.updateType == UpdateType.dragging) {
+          slideDirection = event.direction;
+          slidePercent = event.slidePercent;
+
+          if (slideDirection == SlideDirection.leftToRight) {
+            nextPageIndex = activeIndex - 1;
+          } else if (slideDirection == SlideDirection.rightToLeft) {
+            nextPageIndex = activeIndex + 1;
+          } else {
+            nextPageIndex = activeIndex;
+          }
+        } else if (event.updateType == UpdateType.doneDragging) {
+          if (slidePercent > 0.5) {
+            animatedPageDragger = AnimatedPageDragger(
+              slideDirection: slideDirection,
+              transitionGoal: TransitionGoal.open,
+              slidePercent: slidePercent,
+              slideUpdateStream: slideUpdateStream,
+              vsync: this,
+            );
+          } else {
+            animatedPageDragger = AnimatedPageDragger(
+              slideDirection: slideDirection,
+              transitionGoal: TransitionGoal.close,
+              slidePercent: slidePercent,
+              slideUpdateStream: slideUpdateStream,
+              vsync: this,
+            );
+          }
+
+          animatedPageDragger.run();
+        } else if (event.updateType == UpdateType.animating) {
+          slideDirection = event.direction;
+          slidePercent = event.slidePercent;
+        } else if (event.updateType == UpdateType.doneAnimating) {
+          if (animatedPageDragger.transitionGoal == TransitionGoal.open) {
+            activeIndex = nextPageIndex;
+          }
+          slideDirection = SlideDirection.none;
+          slidePercent = 0.0;
+
+          animatedPageDragger.dispose();
+        }
+      });
     });
-  }
-
-  void _onSkip() {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      Routes.auth,
-      (route) => false,
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
-        alignment: Alignment.bottomCenter,
         children: [
-          GestureDetector(
-            onHorizontalDragUpdate: (details) {
-              _pageController.position
-                  .moveTo(_pageController.position.pixels - details.delta.dx);
-            },
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: _pages.length,
-              onPageChanged: _onPageChanged,
-              itemBuilder: (context, index) {
-                return Stack(
-                  children: [
-                    Column(
-                      children: [
-                        Container(
-                          height: MediaQuery.of(context).size.height / 2,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage("assets/images/background.png"),
-                              fit: BoxFit.cover,
-                              alignment: Alignment.topCenter,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.25,
-                        ),
-                        Center(
-                          child: Image.asset(
-                            _pages[index]['image']!,
-                            height: MediaQuery.of(context).size.height * 0.3,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                _pages[index]['title']!,
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                _pages[index]['text']!,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 20),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              },
+          Page(
+            viewModel: pages[activeIndex],
+            percentVisible: 1.0,
+          ),
+          PageReveal(
+            revealPercent: slidePercent,
+            child: Page(
+              viewModel: pages[nextPageIndex],
+              percentVisible: slidePercent,
             ),
           ),
-          Positioned(
-            bottom: 20,
-            left: 20,
-            right: 20,
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    _pages.length,
-                    (index) => Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color:
-                            _currentPage == index ? Colors.blue : Colors.grey,
-                      ),
-                    ),
-                  ),
-                ),
-                Row(
-                  children: [
-                    if (_currentPage != _pages.length - 1)
-                      TextButton(
-                        onPressed: () {
-                          _pageController.animateToPage(
-                            _pages.length - 1,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        child: const Text('Saltar'),
-                      ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () {
-                        if (_currentPage == _pages.length - 1) {
-                          _onSkip();
-                        } else {
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      },
-                      child: Text(
-                        _currentPage == _pages.length - 1
-                            ? 'Comenzar'
-                            : 'Siguiente',
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+          PagerIndicator(
+            viewModel: PagerIndicatorViewModel(
+              pages,
+              activeIndex,
+              slideDirection,
+              slidePercent,
             ),
           ),
+          PageDragger(
+            canDragLeftToRight: activeIndex > 0,
+            canDragRightToLeft: activeIndex < pages.length - 1,
+            slideUpdateStream: slideUpdateStream,
+          )
         ],
       ),
     );
   }
 }
+
+class Page extends StatelessWidget {
+  final PageViewModel viewModel;
+  final double percentVisible;
+
+  const Page({
+    super.key,
+    required this.viewModel,
+    this.percentVisible = 1.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      color: viewModel.color,
+      child: Opacity(
+        opacity: percentVisible,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Transform(
+              transform: Matrix4.translationValues(
+                  0.0, 50.0 * (1.0 - percentVisible), 0.0),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 25.0),
+                child: Image.asset(viewModel.heroAssetPath,
+                    width: 200.0, height: 200.0),
+              ),
+            ),
+            Transform(
+              transform: Matrix4.translationValues(
+                  0.0, 30.0 * (1.0 - percentVisible), 0.0),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                child: Text(
+                  viewModel.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 30.0,
+                  ),
+                ),
+              ),
+            ),
+            Transform(
+              transform: Matrix4.translationValues(
+                  0.0, 30.0 * (1.0 - percentVisible), 0.0),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 75.0),
+                child: Text(
+                  viewModel.body,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16.0,
+                  ),
+                ),
+              ),
+            ),
+            if (viewModel == pages.last) // Si es la última página
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, Routes.auth);
+                },
+                child: const Text('Comenzar'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+final pages = [
+  PageViewModel(
+    const Color(0xFF5DADE2),
+    'assets/images/welcome1.png',
+    'Bienvenido a LearnQuest',
+    'Descubre un mundo de aprendizaje personalizado. Genera rutas de estudio adaptadas a tus objetivos y preferencias.',
+    const Icon(
+      Icons.phone_android,
+      color: Colors.white,
+    ),
+  ),
+  PageViewModel(
+    const Color(0xFF8E44AD),
+    'assets/images/welcome2.png',
+    'Explora y Aprende',
+    'Navega a través de un mapa interactivo, completa niveles y desbloquea mundos de conocimiento. Aprende jugando y diviértete.',
+    const Icon(
+      Icons.travel_explore,
+      color: Colors.white,
+    ),
+  ),
+  PageViewModel(
+    const Color(0xFFBB8FCE),
+    'assets/images/welcome3.png',
+    'Personaliza y Conecta',
+    'Ajusta tu ruta de aprendizaje según tus necesidades. Únete a una comunidad de aprendices y comparte tus progresos.',
+    const Icon(
+      Icons.school,
+      color: Colors.white,
+    ),
+  ),
+];

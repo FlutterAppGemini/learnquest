@@ -11,7 +11,7 @@ class Routes {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case welcome:
-        return _buildFadeRoute(const WelcomePage(), settings);
+        return _buildFadeRoute(WelcomePage(), settings);
       case home:
         return _buildFadeRoute(const HomePage(), settings);
       case auth:

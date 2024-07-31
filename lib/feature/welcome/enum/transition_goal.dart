@@ -1,0 +1,4 @@
+enum TransitionGoal {
+  open,
+  close,
+}
