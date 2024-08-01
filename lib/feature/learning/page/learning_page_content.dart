@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:learnquest/feature/learning/page/learning_page.dart';
 
 class LearningPageContent extends StatefulWidget {
   final List<Lesson> lessons;
-  LearningPageContent({super.key, required this.lessons});
+  const LearningPageContent({super.key, required this.lessons});
 
   @override
   State<LearningPageContent> createState() => _LearningPageContentState();
@@ -44,7 +43,7 @@ class _LearningPageContentState extends State<LearningPageContent> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10.0),
+                const SizedBox(height: 10.0),
                 Text(
                   lesson.title,
                   textAlign: TextAlign.center, // Centra el texto

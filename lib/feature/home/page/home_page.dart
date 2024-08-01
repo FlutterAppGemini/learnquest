@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:learnquest/feature/chat/page/chat_page.dart';
+import 'package:learnquest/feature/home/components/bottom_nav_item.dart';
 import 'package:learnquest/feature/learning/page/learning_page.dart';
-import 'package:learnquest/feature/loading_overlay.dart';
 import 'package:learnquest/feature/profile/page/profile_page.dart';
+import 'package:learnquest/feature/loading_overlay.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,20 +14,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool _isLoading = false;
-  int _selectedIndex = 0;
-  final PageController _pageController = PageController();
-
-  Future<void> _simulateLoading() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    await Future.delayed(const Duration(seconds: 5));
-
-    setState(() {
-      _isLoading = false;
-    });
-  }
+  int _selectedIndex = 1;
+  final PageController _pageController = PageController(initialPage: 1);
 
   void _onItemTapped(int index) {
     setState(() {
@@ -58,73 +47,99 @@ class _HomePageState extends State<HomePage> {
               });
             },
             children: [
-              ChatPage(setLoading: _setLoading),
               const LearningPage(
-                lessons: [
-                  // Lesson(
-                  //     title: 'Aprender Flutter',
-                  //     color: 'FF5733', // Color en formato hexadecimal
-                  //     img: 'https://i.ibb.co/MpF3frb/flutter-207x256.png'),
-                  // Lesson(
-                  //     title: 'Programación en Dart',
-                  //     color: '33FF57', // Color en formato hexadecimal
-                  //     img: 'https://i.ibb.co/0y7VDnV/dart-255x256.png'),
-                  // Lesson(
-                  //   title: 'Interfaz de Usuario',
-                  //   color: '3399FF', // Color en formato hexadecimal
-                  //   img:
-                  //       'https://iconduck.com/icons/7533/search.png', // GIF relacionado con diseño de interfaz
-                  // ),
-                  // Lesson(
-                  //   title: 'Desarrollo Web',
-                  //   color: 'FF33A2', // Color en formato hexadecimal
-                  //   img:
-                  //       'https://iconduck.com/illustrations/107688/web-development.png', // GIF relacionado con desarrollo web
-                  // ),
-                  // Lesson(
-                  //   title: 'Bases de Datos',
-                  //   color: 'FFD733', // Color en formato hexadecimal
-                  //   img:
-                  //       'https://iconduck.com/icons/92756/database-sql.png', // GIF relacionado con bases de datos
-                  // ),
-                  // Lesson(
-                  //   title: 'Programación Orientada a Objetos',
-                  //   color: '9B59B6', // Color en formato hexadecimal
-                  //   img:
-                  //       'https://iconduck.com/illustrations/105639/coding.png', // GIF relacionado con POO
-                  // ),
-                  // Lesson(
-                  //   title: 'Algoritmos y Estructuras de Datos',
-                  //   color: 'FF6F61', // Color en formato hexadecimal
-                  //   img:
-                  //       'https://iconduck.com/icons/138675/ai-mi-algorithm.png', // GIF relacionado con algoritmos
-                  // )
-                ],
+                lessons: [],
               ),
+              ChatPage(setLoading: _setLoading),
               const ProfilePage(),
             ],
           ),
-          bottomNavigationBar: BottomNavigationBar(
+          bottomNavigationBar: AnimatedBottomNav(
             currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.chat),
-                label: 'Chat',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.book),
-                label: 'Learning',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-            ],
+            onChange: _onItemTapped,
           ),
+          floatingActionButton: GestureDetector(
+            onTap: () {
+              _onItemTapped(1);
+            },
+            child: Container(
+              width: 56.0,
+              height: 56.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFF8E44AD),
+                    Color(0xFFBB8FCE),
+                  ],
+                  begin: Alignment.bottomRight,
+                  end: Alignment.bottomLeft,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    spreadRadius: 3,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
         ),
         LoadingOverlay(isLoading: _isLoading),
       ],
+    );
+  }
+}
+
+class AnimatedBottomNav extends StatelessWidget {
+  final int currentIndex;
+  final Function(int) onChange;
+
+  const AnimatedBottomNav(
+      {super.key, required this.currentIndex, required this.onChange});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: kToolbarHeight,
+      decoration: const BoxDecoration(color: Colors.white),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: InkResponse(
+              onTap: () => onChange(0),
+              highlightColor: Colors.transparent,
+              splashColor: Colors.transparent,
+              child: BottomNavItem(
+                icon: Icons.book,
+                title: "Learning",
+                isActive: currentIndex == 0,
+              ),
+            ),
+          ),
+          const SizedBox(width: 40),
+          Expanded(
+            child: InkResponse(
+              onTap: () => onChange(2),
+              highlightColor: Colors.transparent,
+              splashColor: Colors.transparent,
+              child: BottomNavItem(
+                icon: Icons.person,
+                title: "Profile",
+                isActive: currentIndex == 2,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
