@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:learnquest/common/routes/routes.dart';
 
 class ChatPage extends StatefulWidget {
   final Function(bool) setLoading;
@@ -22,12 +23,22 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     createTile(Learn learn) => Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: _buildWikiCategory(learn.icon, learn.name, learn.color),
-              ),
-            ],
+          child: InkWell(
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                Routes.detail,
+                arguments: learn,
+              );
+            },
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child:
+                      _buildWikiCategory(learn.icon, learn.name, learn.color),
+                ),
+              ],
+            ),
           ),
         );
 
