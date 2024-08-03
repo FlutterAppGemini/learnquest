@@ -15,6 +15,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _isLoading = false;
   int _selectedIndex = 1;
+  List<Lesson> lessons = [];
   final PageController _pageController = PageController(initialPage: 1);
 
   void _onItemTapped(int index) {
@@ -50,7 +51,10 @@ class _HomePageState extends State<HomePage> {
               const LearningPage(
                 lessons: [],
               ),
-              ChatPage(setLoading: _setLoading),
+              ChatPage(
+                setLoading: _setLoading,
+                lessons: lessons,
+              ),
               const ProfilePage(),
             ],
           ),

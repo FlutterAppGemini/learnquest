@@ -47,6 +47,9 @@ dependencies:
   concentric_transition: ^1.0.3
   lottie: ^3.1.2
   provider: ^6.1.2
+  google_generative_ai: ^0.4.4
+  flutter_dotenv: ^5.1.0
+  dynamic_icons: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +76,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - .env
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

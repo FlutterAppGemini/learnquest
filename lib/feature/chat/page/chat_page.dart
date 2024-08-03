@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:learnquest/common/routes/routes.dart';
+import 'package:learnquest/feature/learning/page/learning_page.dart';
+import 'package:learnquest/service/gemini_service.dart';
 
 class ChatPage extends StatefulWidget {
+  final List<Lesson> lessons;
   final Function(bool) setLoading;
-  const ChatPage({super.key, required this.setLoading});
+  const ChatPage({super.key, required this.setLoading, required this.lessons});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -17,6 +20,25 @@ class _ChatPageState extends State<ChatPage> {
     await Future.delayed(const Duration(seconds: 5));
 
     widget.setLoading(false);
+  }
+
+  final TextEditingController _controller = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    GeminiService.load();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _createLesson(String value) async {
+    await GeminiService.load();
+    Lesson lesson = await GeminiService.createLesson(value);
+    widget.lessons.add(lesson);
   }
 
   @override
@@ -54,69 +76,91 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
 
-    return Stack(
-      children: <Widget>[
-        ClipPath(
-          clipper: WaveClipper(),
-          child: Container(
-            height: 350,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color.fromARGB(255, 91, 31, 165),
-                  Color.fromARGB(255, 153, 60, 211),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          ClipPath(
+            clipper: WaveClipper(),
+            child: Container(
+              height: 250,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 91, 31, 165),
+                    Color.fromARGB(255, 153, 60, 211),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
             ),
           ),
-        ),
-        Column(
-          children: <Widget>[
-            const SizedBox(height: 40),
-            Container(
-              margin: const EdgeInsets.symmetric(
-                vertical: 8.0,
-                horizontal: 16.0,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              padding: const EdgeInsets.symmetric(
-                vertical: 8.0,
-                horizontal: 20.0,
-              ),
-              child: Row(
-                children: <Widget>[
-                  const Expanded(
-                    child: TextField(
-                      textInputAction: TextInputAction.send,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: 10.0,
-                          horizontal: 20.0,
+          Column(
+            children: <Widget>[
+              const SizedBox(height: 40),
+              Container(
+                margin: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 16.0,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(10.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 20.0,
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        textInputAction: TextInputAction.send,
+                        decoration: const InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: 10.0,
+                            horizontal: 20.0,
+                          ),
+                          border: InputBorder.none,
+                          hintText: "¿Qué quieres aprender?",
                         ),
-                        border: OutlineInputBorder(),
-                        hintText: "¿Que quieres aprender?",
+                        onSubmitted: (value) {
+                          _createLesson(value);
+                          _controller.clear();
+                        },
                       ),
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    color: const Color.fromARGB(255, 1, 82, 173),
-                    onPressed: () {},
-                  )
-                ],
+                    IconButton(
+                      icon: const Icon(Icons.mic),
+                      color: const Color.fromARGB(255, 1, 82, 173),
+                      onPressed: () {
+                        // Lógica para escuchar voz
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      color: const Color.fromARGB(255, 1, 82, 173),
+                      onPressed: () {},
+                    )
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: liste,
-            ),
-          ],
-        ),
-      ],
+              Expanded(
+                child: liste,
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -127,15 +171,23 @@ class _ChatPageState extends State<ChatPage> {
           padding: const EdgeInsets.all(26.0),
           alignment: Alignment.centerRight,
           decoration: BoxDecoration(
-            color: color,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(20.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, 3), // changes position of shadow
+              ),
+            ],
           ),
           child: Opacity(
-              opacity: 0.3,
+              opacity: 0.1,
               child: Icon(
                 icon,
                 size: 40,
-                color: Colors.white,
+                color: Colors.black,
               )),
         ),
         Padding(
@@ -146,13 +198,13 @@ class _ChatPageState extends State<ChatPage> {
             children: <Widget>[
               Icon(
                 icon,
-                color: Colors.white,
+                color: color,
               ),
               const SizedBox(height: 16.0),
               Text(
                 label,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
               )
@@ -204,12 +256,12 @@ class Learn {
 final List<Learn> learn = [
   Learn(
     'Math',
-    Icons.design_services,
+    Icons.calculate,
     Colors.blue[400]!,
   ),
   Learn(
     'Geography',
-    Icons.public_sharp,
+    Icons.public,
     Colors.orange[400]!,
   ),
   Learn(
@@ -224,12 +276,12 @@ final List<Learn> learn = [
   ),
   Learn(
     'Cook',
-    Icons.food_bank,
+    Icons.kitchen,
     Colors.orange[400]!,
   ),
   Learn(
     'Cloud',
-    Icons.filter_drama_outlined,
+    Icons.cloud,
     Colors.lightBlue[600]!,
   ),
   Learn(

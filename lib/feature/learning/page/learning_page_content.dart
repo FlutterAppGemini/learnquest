@@ -37,10 +37,6 @@ class _LearningPageContentState extends State<LearningPageContent> {
                     shape: BoxShape.circle,
                     border: Border.all(
                         color: Colors.yellow, width: 2.0), // Borde del círculo
-                    image: DecorationImage(
-                      image: NetworkImage(lesson.img), // Imagen desde URL
-                      fit: BoxFit.contain,
-                    ),
                   ),
                 ),
                 const SizedBox(height: 10.0),

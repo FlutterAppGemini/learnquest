@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:learnquest/common/routes/routes.dart';
 
 class LessonDetail extends StatefulWidget {
@@ -13,6 +14,7 @@ class _LessonDetailState extends State<LessonDetail>
     with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   double _progress = 0;
+  double _secondaryProgress = 0;
   late AnimationController _animationController;
 
   @override
@@ -28,8 +30,12 @@ class _LessonDetailState extends State<LessonDetail>
   void _updateProgress() {
     final maxScrollExtent = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
+    final newProgress = (currentScroll / maxScrollExtent).clamp(0, 1);
+
     setState(() {
-      _progress = (currentScroll / maxScrollExtent).clamp(0, 1);
+      _progress = newProgress > _progress ? newProgress as double : _progress;
+      _secondaryProgress = (_progress * 0.8).clamp(0, 1);
+
       if (_progress == 1) {
         _animationController.forward();
       } else {
@@ -85,8 +91,10 @@ class _LessonDetailState extends State<LessonDetail>
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(4.0),
           child: ScaleTransition(
-            scale: _animationController.drive(Tween(begin: 1.0, end: 1.5)
-                .chain(CurveTween(curve: Curves.elasticOut))),
+            scale: _animationController.drive(
+              Tween(begin: 1.0, end: 1.5)
+                  .chain(CurveTween(curve: Curves.elasticOut)),
+            ),
             child: LinearProgressIndicator(
               value: _progress,
               backgroundColor: Colors.grey[200],
@@ -111,12 +119,19 @@ class _LessonDetailState extends State<LessonDetail>
                 const Text(
                     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent lacinia, odio ut placerat finibus, ipsum risus consectetur ligula, non mattis mi neque ac mi."),
                 const SizedBox(height: 20.0),
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Icon(Icons.memory),
-                    SizedBox(width: 5.0),
-                    Text("65%"),
+                    const SizedBox(width: 10.0),
+                    Expanded(
+                      child: LinearProgressIndicator(
+                        value: _secondaryProgress,
+                        backgroundColor: Colors.grey[300],
+                        color: Colors.green,
+                      ),
+                    ),
+                    const SizedBox(width: 10.0),
+                    Text("${(_secondaryProgress * 100).toInt()}%"),
                   ],
                 ),
                 const SizedBox(height: 20.0),
@@ -136,6 +151,7 @@ class _LessonDetailState extends State<LessonDetail>
                     )
                   ],
                 ),
+                const SizedBox(height: 20.0),
               ],
             ),
           ),
