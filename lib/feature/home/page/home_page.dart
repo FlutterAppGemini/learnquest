@@ -48,8 +48,8 @@ class _HomePageState extends State<HomePage> {
               });
             },
             children: [
-              const LearningPage(
-                lessons: [],
+              LearningPage(
+                lessons: lessons,
               ),
               ChatPage(
                 setLoading: _setLoading,
