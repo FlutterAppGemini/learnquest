@@ -53,4 +53,24 @@ class GeminiService {
     final lesson = Lesson.fromJson(map);
     return lesson;
   }
+
+  static Future<bool> isInappropiate(String prompt) async {
+    final content = [
+      Content.text(
+          "Por favor, analiza el siguiente texto y devuelve un objeto JSON con los siguientes campos:\n"
+          "{\n"
+          "  \"reason\": \"string\",\n"
+          "  \"value\": \"boolean\"\n"
+          "}\n"
+          "El texto a analizar es: '$prompt'.\n"
+          "El campo 'reason' debe contener una descripción del motivo si se encuentra contenido inapropiado.\n"
+          "El campo 'value' debe ser true si el texto contiene contenido inapropiado, y false en caso contrario.\n"
+          "La respuesta debe ser solo el JSON, sin texto adicional.")
+    ];
+
+    final response = (await GeminiService.model.generateContent(content));
+    print("El valor booleano es: ${response.text}");
+    final map = jsonDecode(response.text ?? '') as Map<String, dynamic>;
+    return map["value"];
+  }
 }
