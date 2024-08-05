@@ -3,6 +3,7 @@ import 'package:learnquest/feature/auth/page/auth_page.dart';
 import 'package:learnquest/feature/chat/page/chat_page.dart';
 import 'package:learnquest/feature/chat/page/detail_page.dart';
 import 'package:learnquest/feature/chat/page/lesson_detail.dart';
+import 'package:learnquest/feature/game/page/game_page.dart';
 import 'package:learnquest/feature/home/page/home_page.dart';
 import 'package:learnquest/feature/welcome/page/welcome_page.dart';
 
@@ -11,6 +12,7 @@ class Routes {
   static const String home = 'home';
   static const String auth = 'auth';
   static const String detail = 'detail';
+  static const String game = 'game';
   static const String error = 'error';
   static const String lesson = 'lesson';
 
@@ -26,6 +28,8 @@ class Routes {
         return _buildFadeRoute(const DetailPage(), settings);
       case lesson:
         return _buildFadeRoute(const LessonDetail(), settings);
+      case game:
+        return _buildFadeRoute(const GamePage(), settings);
       case error:
         return _buildFadeRoute(const Scaffold(), settings);
       default:
