@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:learnquest/common/routes/routes.dart';
 import 'package:learnquest/feature/learning/page/learning_page.dart';
 import 'package:learnquest/service/gemini_service.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class ChatPage extends StatefulWidget {
   final List<Lesson> lessons;
@@ -36,9 +39,26 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> _createLesson(String value) async {
-    await GeminiService.load();
-    Lesson lesson = await GeminiService.createLesson(value);
-    widget.lessons.add(lesson);
+    try {
+      bool valor = await GeminiService.isInappropiate(value);
+      if (!valor) {
+        await GeminiService.load();
+        Lesson lesson = await GeminiService.createLesson(value);
+        widget.lessons.add(lesson);
+      } else {
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          text: 'El tema que deseas aprender es inapropiado',
+        );
+      }
+    } on GenerativeAIException {
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.warning,
+        text: 'Los temas inapropiados no están permitidos',
+      );
+    }
   }
 
   @override

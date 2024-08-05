@@ -34,8 +34,8 @@ class GeminiService {
           "La respuesta debe ser solo un JSON válido, incluyendo un campo 'icon' con un valor dinámico. Ejemplo de formato JSON:\n"
           "{\n"
           "  \"title\": \"Título de ejemplo\",\n"
-          "  \"icon\": \"icono-dinamico\",\n"
-          "  \"color\": \"FF9800(no necesariamente tiene que ser este color, puede ser cualquier otro)\",\n"
+          "  \"icon\": \"icono-dinamico (por ejemplo de dynamic_icons:widgets solo necesitaría 'widgets', si el título es geografía, usa un icon de geography, si te hablan de flutter, usa el icono 'flutter_dash' pq encajaría mejor con ello, no uses únicamente el widget 'widgets' usa tu imaginación para variar en el icono elegido)\",\n"
+          "  \"color\": \"000000(no necesariamente tiene que ser este color, puede ser cualquier otro)\",\n"
           "  \"questions\": [\n"
           "    {\"question\": \"Pregunta 1\"},\n"
           "    {\"question\": \"Pregunta 2\"}\n"
@@ -52,5 +52,25 @@ class GeminiService {
     final map = jsonDecode(response.text ?? '') as Map<String, dynamic>;
     final lesson = Lesson.fromJson(map);
     return lesson;
+  }
+
+  static Future<bool> isInappropiate(String prompt) async {
+    final content = [
+      Content.text(
+          "Por favor, analiza el siguiente texto y devuelve un objeto JSON con los siguientes campos:\n"
+          "{\n"
+          "  \"reason\": \"string\",\n"
+          "  \"value\": \"boolean\"\n"
+          "}\n"
+          "El texto a analizar es: '$prompt'.\n"
+          "El campo 'reason' debe contener una descripción del motivo si se encuentra contenido inapropiado.\n"
+          "El campo 'value' debe ser true si el texto contiene contenido inapropiado, y false en caso contrario.\n"
+          "La respuesta debe ser solo el JSON, sin texto adicional.")
+    ];
+
+    final response = (await GeminiService.model.generateContent(content));
+    print("El valor booleano es: ${response.text}");
+    final map = jsonDecode(response.text ?? '') as Map<String, dynamic>;
+    return map["value"];
   }
 }
