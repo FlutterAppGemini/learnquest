@@ -1,7 +1,9 @@
 import 'package:learnquest/common/models/question.dart';
 
+enum Type { write, selection }
+
 class Game {
-  String type;
+  Type type;
   List<Question> data;
 
   Game({
@@ -11,14 +13,15 @@ class Game {
 
   factory Game.fromJson(Map<String, dynamic> json) {
     return Game(
-      type: json['type'],
+      type:
+          Type.values.firstWhere((e) => e.toString() == 'Type.${json['type']}'),
       data: (json['data'] as List).map((i) => Question.fromJson(i)).toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'type': type,
+      'type': type.toString().split('.').last,
       'data': data.map((i) => i.toJson()).toList(),
     };
   }

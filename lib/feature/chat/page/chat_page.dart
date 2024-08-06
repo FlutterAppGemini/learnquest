@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:learnquest/common/models/course.dart';
 import 'package:learnquest/common/routes/routes.dart';
 import 'package:learnquest/feature/learning/page/learning_page.dart';
 import 'package:learnquest/service/gemini_service.dart';
@@ -8,9 +9,9 @@ import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class ChatPage extends StatefulWidget {
-  final List<Lesson> lessons;
+  final List<Course> courses;
   final Function(bool) setLoading;
-  const ChatPage({super.key, required this.setLoading, required this.lessons});
+  const ChatPage({super.key, required this.setLoading, required this.courses});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -43,8 +44,8 @@ class _ChatPageState extends State<ChatPage> {
       bool valor = await GeminiService.isInappropiate(value);
       if (!valor) {
         await GeminiService.load();
-        Lesson lesson = await GeminiService.createLesson(value);
-        widget.lessons.add(lesson);
+        Course course = await GeminiService.createCourse(value);
+        widget.courses.add(course);
       } else {
         QuickAlert.show(
           context: context,

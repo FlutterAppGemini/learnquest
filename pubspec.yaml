@@ -51,6 +51,7 @@ dependencies:
   flutter_dotenv: ^5.1.0
   dynamic_icons: ^1.0.0
   quickalert: ^1.1.0
+  flutter_custom_clippers: ^2.1.0
 
 dev_dependencies:
   flutter_test:

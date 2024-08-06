@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:learnquest/common/routes/routes.dart';
 import 'package:learnquest/feature/chat/page/chat_page.dart';
@@ -48,70 +49,69 @@ class _DetailPageState extends State<DetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(0, 0, 0, 0),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            _buildHeader(learn.name, learn.icon, learn.color),
-            const SizedBox(height: 10.0),
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "Progress".toUpperCase(),
-                    style: const TextStyle(
-                        fontSize: 18.0, fontWeight: FontWeight.bold),
-                  ),
-                  const Divider(
-                    color: Colors.black54,
-                  ),
-                ],
+      body: HeaderWidget(
+        header: _buildHeader(learn.name, learn.icon, learn.color),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, top: 10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Progress".toUpperCase(),
+                      style: const TextStyle(
+                          fontSize: 18.0, fontWeight: FontWeight.bold),
+                    ),
+                    const Divider(
+                      color: Colors.black54,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 10.0),
-            _buildProgressRow("Lessons",
-                "${lessons.where((lesson) => lesson.progress >= 1.0).length}/${lessons.length}"),
-            const SizedBox(height: 5.0),
-            _buildProgressRow("Questions correct", "50/60"),
-            const SizedBox(height: 5.0),
-            _buildProgressRow("Questions incorrect", "10/60"),
-            const SizedBox(height: 30.0),
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Progress".toUpperCase(),
-                        style: const TextStyle(
-                            fontSize: 18.0, fontWeight: FontWeight.bold),
-                      ),
-                      TextButton.icon(
-                        onPressed: _addNewLesson,
-                        icon: const Icon(Icons.add),
-                        label: const Text('Generate New Lesson'),
-                      ),
-                    ],
-                  ),
-                  const Divider(
-                    color: Colors.black54,
-                  ),
-                ],
+              _buildProgressRow("Lessons",
+                  "${lessons.where((lesson) => lesson.progress >= 1.0).length}/${lessons.length}"),
+              _buildProgressRow("Questions correct", "50/60"),
+              _buildProgressRow("Questions incorrect", "10/60"),
+              const SizedBox(height: 30.0),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Lessons".toUpperCase(),
+                          style: const TextStyle(
+                              fontSize: 18.0, fontWeight: FontWeight.bold),
+                        ),
+                        TextButton.icon(
+                          onPressed: _addNewLesson,
+                          icon: const Icon(Icons.add),
+                          label: const Text('Generate New Lesson'),
+                        ),
+                      ],
+                    ),
+                    const Divider(
+                      color: Colors.black54,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            ...lessons.map((lesson) =>
-                _buildLessonRow(lesson.name, lesson.subtitle, lesson.progress)),
-            const SizedBox(height: 15.0),
-          ],
+              ...lessons.map((lesson) => _buildLessonRow(
+                  lesson.name, lesson.subtitle, lesson.progress)),
+              const SizedBox(height: 15.0),
+            ],
+          ),
         ),
       ),
     );
@@ -250,4 +250,76 @@ class Lesson {
   final double progress;
 
   Lesson(this.name, this.subtitle, this.progress);
+}
+
+class HeaderWidget extends StatelessWidget {
+  final Widget? body;
+  final Widget? header;
+  final Color headerColor;
+  final Color backColor;
+
+  const HeaderWidget(
+      {super.key,
+      this.body,
+      this.header,
+      this.headerColor = Colors.white,
+      this.backColor = Colors.deepPurple});
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildBody();
+  }
+
+  Stack _buildBody() {
+    return Stack(
+      children: <Widget>[
+        Positioned(
+          right: 0,
+          top: 0,
+          width: 10,
+          height: 200,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+                color: backColor,
+                borderRadius:
+                    const BorderRadius.only(topLeft: Radius.circular(20.0))),
+          ),
+        ),
+        Positioned(
+          right: 0,
+          top: 100,
+          width: 50,
+          bottom: 0,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: backColor,
+            ),
+          ),
+        ),
+        Column(
+          children: <Widget>[
+            if (header != null)
+              Container(
+                  margin: const EdgeInsets.only(right: 10.0),
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                        bottomRight: Radius.circular(20.0)),
+                    color: headerColor,
+                  ),
+                  child: header),
+            if (body != null)
+              Expanded(
+                child: Material(
+                    shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.only(topLeft: Radius.circular(30.0))),
+                    elevation: 0,
+                    color: backColor,
+                    child: body),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
 }

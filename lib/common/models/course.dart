@@ -3,7 +3,7 @@ import 'package:learnquest/common/models/lesson.dart';
 
 class Course {
   String title;
-  IconData icon;
+  String icon;
   Color color;
   String description;
   List<Lesson> lessons;
@@ -19,7 +19,7 @@ class Course {
   factory Course.fromJson(Map<String, dynamic> json) {
     return Course(
       title: json['title'],
-      icon: IconData(json['icon'], fontFamily: 'MaterialIcons'),
+      icon: json['icon'],
       color: Color(json['color']),
       description: json['description'],
       lessons:
@@ -30,7 +30,7 @@ class Course {
   Map<String, dynamic> toJson() {
     return {
       'title': title,
-      'icon': icon.codePoint,
+      'icon': icon,
       'color': color.value,
       'description': description,
       'lessons': lessons.map((i) => i.toJson()).toList(),

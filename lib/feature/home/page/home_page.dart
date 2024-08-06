@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learnquest/common/models/course.dart';
 import 'package:learnquest/feature/chat/page/chat_page.dart';
 import 'package:learnquest/feature/home/components/bottom_nav_item.dart';
 import 'package:learnquest/feature/learning/page/learning_page.dart';
@@ -15,7 +16,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _isLoading = false;
   int _selectedIndex = 1;
-  List<Lesson> lessons = [];
+  List<Course> courses = [];
   final PageController _pageController = PageController(initialPage: 1);
 
   void _onItemTapped(int index) {
@@ -49,11 +50,11 @@ class _HomePageState extends State<HomePage> {
             },
             children: [
               LearningPage(
-                lessons: lessons,
+                courses: courses,
               ),
               ChatPage(
                 setLoading: _setLoading,
-                lessons: lessons,
+                courses: courses,
               ),
               const ProfilePage(),
             ],

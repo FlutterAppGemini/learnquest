@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:learnquest/feature/learning/page/learning_page.dart';
+import 'package:learnquest/common/models/course.dart';
 
 class GeminiService {
   static late GenerativeModel model;
@@ -16,33 +16,11 @@ class GeminiService {
             GenerationConfig(responseMimeType: "application/json"));
   }
 
-  static Future<Lesson> createLesson(String prompt) async {
+  static Future<Course> createCourse(String prompt) async {
     final content = [
       Content.text(
-          "Por favor, genera un objeto JSON que siga este formato exacto para el tema '$prompt':\n"
-          "class Question {\n"
-          "  final String question;\n"
-          "  const Question({required this.question});\n"
-          "}\n\n"
-          "class Lesson {\n"
-          "  final String title;\n"
-          "  final String icon;  // Asegúrate de incluir un valor de string de la documentación de Icon class de la página 'https://api.flutter.dev/flutter/material/Icons-class.html' DynamicIcons.getIconFromName\n"
-          "  final String color;\n //Asegúrate que el valor de string de color no tenga numeral '#'"
-          "  final List<Question> questions;\n"
-          "  const Lesson({required this.title, required this.icon, required this.color, required this.questions});\n"
-          "}\n\n"
-          "La respuesta debe ser solo un JSON válido, incluyendo un campo 'icon' con un valor dinámico. Ejemplo de formato JSON:\n"
-          "{\n"
-          "  \"title\": \"Título de ejemplo\",\n"
-          "  \"icon\": \"icono-dinamico (por ejemplo de dynamic_icons:widgets solo necesitaría 'widgets', si el título es geografía, usa un icon de geography, si te hablan de flutter, usa el icono 'flutter_dash' pq encajaría mejor con ello, no uses únicamente el widget 'widgets' usa tu imaginación para variar en el icono elegido)\",\n"
-          "  \"color\": \"000000(no necesariamente tiene que ser este color, puede ser cualquier otro)\",\n"
-          "  \"questions\": [\n"
-          "    {\"question\": \"Pregunta 1\"},\n"
-          "    {\"question\": \"Pregunta 2\"}\n"
-          "  ]\n"
-          "}\n"
-          "el atributo questions debe tener una lista de entre 20 a 30 question puedes elegir de forma random"
-          "No incluyas ningún texto adicional fuera del JSON.")
+        "Genera una colección json relativo al tema de $prompt con esta Estructura esperada:\n{\n    \"title\": \"titulo\",\n    \"icon\": \"Asegúrate de incluir un nombre de icono de la documentación de Icon class de la página 'https://api.flutter.dev/flutter/material/Icons-class.html', el string que devuelvas debe permitirme usar el método DynamicIcons.getIconFromName('icon_name')\",\n    \"color\": \"es un String que representa un color pero en sistema hexadecimal(no incluyas el numeral)\",\n    \"description\": \"descripcion breve de la materia o lo q se vera\",\n    \"lessons\": [\n        {\n            \"title\": \"titulo de la leccion\",\n            \"content\": \"contenido de toda la leccion, informacion a modo de texto debe ser extenso si es posible, debe estar detallado para q cualquier usuario de cualquier edad lo entienda, debe estar relacionado con las preguntas q se hace, con respectivos ejemplos\",\n            \"progress\": 0,\n            \"game\": {\n                \"type\": \"tipo de juego cuestionario o para escribir(ejemplo cuestionario)\",\n                \"data\": [\n                    {\n                        \"question\": \"pregunta 1\",\n                        \"response\": [\n                            \"respuesta 1\",\n                            \"respuesta 2\",\n                            \"respuesta 3\",\"respuesta 4\",\"respuesta 5\"\n                        ],\n                        \"solution\": \"respuesta 1\"\n                    },\n                    {\n                        \"question\": \"pregunta 2\",\n                        \"response\": [\n                            \"respuesta 1\",\n                            \"respuesta 2\",\n                            \"respuesta 3\"\n                        ],\n                        \"solution\": \"respuesta 3\"\n                    }\n                ]\n            }\n        }\n    ]\n}\n\n1. Al solicitar una lección inicial sobre un tema, la respuesta debe seguir la estructura anterior.\n2. El \"type\" de \"game\" debe ser determinado por la IA (cuestionario o escribir).\n3. La ia decide la cantidad de preguntas(entre 5 y 8) y la cantidad de respuestas para cada pregunta(entre 4 y 7).\n\nEjemplo de solicitud para una lección de matemáticas:\n\"Quiero aprender sobre matemáticas\"\n\nEjemplo de solicitud para validar respuestas en un juego de escribir:\n{\n    \"type\": \"escribir\",\n    \"data\": [\n        {\"question\": \"¿Cuál es la capital de Francia?\", \"response\": [\"París\"], \"user_answer\": \"Paris\"}\n    ]\n}",
+      )
     ];
 
     final response = (await GeminiService.model.generateContent(content));
@@ -50,8 +28,8 @@ class GeminiService {
     print(response.text);
 
     final map = jsonDecode(response.text ?? '') as Map<String, dynamic>;
-    final lesson = Lesson.fromJson(map);
-    return lesson;
+    final course = Course.fromJson(map);
+    return course;
   }
 
   static Future<bool> isInappropiate(String prompt) async {

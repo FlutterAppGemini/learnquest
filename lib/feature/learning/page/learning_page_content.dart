@@ -1,11 +1,11 @@
 import 'package:dynamic_icons/dynamic_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:learnquest/feature/chat/page/chat_page.dart';
-import 'package:learnquest/feature/learning/page/learning_page.dart';
+import 'package:learnquest/common/models/course.dart';
+import 'package:learnquest/common/routes/routes.dart';
 
 class LearningPageContent extends StatefulWidget {
-  final List<Lesson> lessons;
-  const LearningPageContent({super.key, required this.lessons});
+  final List<Course> courses;
+  const LearningPageContent({super.key, required this.courses});
 
   @override
   State<LearningPageContent> createState() => _LearningPageContentState();
@@ -33,7 +33,7 @@ class _LearningPageContentState extends State<LearningPageContent> {
           child: Opacity(
               opacity: 0.1,
               child: DynamicIcons.getIconFromName(
-                icon,
+                icon.toLowerCase(),
                 color: Colors.black,
                 size: 40.0,
               )),
@@ -70,12 +70,21 @@ class _LearningPageContentState extends State<LearningPageContent> {
           mainAxisSpacing: 10.0, // Espaciado entre las filas
           childAspectRatio: 1, // Relación de aspecto de los elementos
         ),
-        itemCount: widget.lessons.length,
+        itemCount: widget.courses.length,
         itemBuilder: (context, index) {
-          final lesson = widget.lessons[index];
-          return Card(
-            child: _buildWikiCategory(lesson.icon, lesson.title,
-                Color(int.parse(lesson.color, radix: 16) + 0xFF000000)),
+          final course = widget.courses[index];
+          return GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                Routes.detail,
+                arguments: course,
+              );
+            },
+            child: Card(
+              child:
+                  _buildWikiCategory(course.icon, course.title, course.color),
+            ),
           );
         },
       ),
