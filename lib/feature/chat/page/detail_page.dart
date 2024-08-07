@@ -1,8 +1,11 @@
+import 'package:dynamic_icons/dynamic_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:learnquest/common/models/course.dart';
+import 'package:learnquest/common/models/lesson.dart';
 import 'package:learnquest/common/routes/routes.dart';
 import 'package:learnquest/feature/chat/page/chat_page.dart';
+import 'package:learnquest/service/gemini_service.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({super.key});
@@ -13,30 +16,16 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   late bool _saveLearn;
-  late List<Lesson> lessons;
   @override
   void initState() {
     super.initState();
     _saveLearn = false;
-    lessons = [
-      Lesson("Lesson 4", "Advanced Algebra", 0.6),
-      Lesson("Lesson 3", "Geometry Basics", 1.0),
-      Lesson("Lesson 2", "Basic Algebra", 0.9),
-      Lesson("Lesson 1", "Introduction to Math", 1.0),
-    ];
-  }
-
-  void _addNewLesson() {
-    setState(() {
-      int newLessonNumber = lessons.length + 1;
-      lessons.insert(0, Lesson("Lesson $newLessonNumber", "New Lesson", 0.0));
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     final arguments = ModalRoute.of(context)!.settings.arguments;
-    if (arguments == null || arguments is! Learn) {
+    if (arguments == null || arguments is! Course) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacementNamed(Routes.error);
       });
@@ -45,86 +34,93 @@ class _DetailPageState extends State<DetailPage> {
       );
     }
 
-    final learn = arguments;
+    final lessons = arguments.lessons;
+    final course = arguments;
+
+    Future<void> createLesson(String courseTitle, Lesson lesson) async {
+      Lesson l = await GeminiService.createLesson(courseTitle, lesson);
+      lessons.add(l);
+    }
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color.fromARGB(0, 0, 0, 0),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
-      body: HeaderWidget(
-        header: _buildHeader(learn.name, learn.icon, learn.color),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0, top: 10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "Progress".toUpperCase(),
-                      style: const TextStyle(
-                          fontSize: 18.0, fontWeight: FontWeight.bold),
-                    ),
-                    const Divider(
-                      color: Colors.black54,
-                    ),
-                  ],
-                ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            _buildHeader(course.title, course.icon, course.color),
+            const SizedBox(height: 10.0),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Progress".toUpperCase(),
+                    style: const TextStyle(
+                        fontSize: 18.0, fontWeight: FontWeight.bold),
+                  ),
+                  const Divider(
+                    color: Colors.black54,
+                  ),
+                ],
               ),
-              _buildProgressRow("Lessons",
-                  "${lessons.where((lesson) => lesson.progress >= 1.0).length}/${lessons.length}"),
-              _buildProgressRow("Questions correct", "50/60"),
-              _buildProgressRow("Questions incorrect", "10/60"),
-              const SizedBox(height: 30.0),
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Lessons".toUpperCase(),
-                          style: const TextStyle(
-                              fontSize: 18.0, fontWeight: FontWeight.bold),
-                        ),
-                        TextButton.icon(
-                          onPressed: _addNewLesson,
-                          icon: const Icon(Icons.add),
-                          label: const Text('Generate New Lesson'),
-                        ),
-                      ],
-                    ),
-                    const Divider(
-                      color: Colors.black54,
-                    ),
-                  ],
-                ),
+            ),
+            const SizedBox(height: 10.0),
+            _buildProgressRow("Lessons",
+                "${lessons.where((lesson) => lesson.progress >= 1.0).length}/${lessons.length}"),
+            const SizedBox(height: 5.0),
+            _buildProgressRow("Questions correct", "50/60"),
+            const SizedBox(height: 5.0),
+            _buildProgressRow("Questions incorrect", "10/60"),
+            const SizedBox(height: 30.0),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Progress".toUpperCase(),
+                        style: const TextStyle(
+                            fontSize: 18.0, fontWeight: FontWeight.bold),
+                      ),
+                      TextButton.icon(
+                        icon: const Icon(Icons.add),
+                        label: const Text('Generate New Lesson'),
+                        onPressed: () {
+                          createLesson(course.title, lessons.last);
+                        },
+                      ),
+                    ],
+                  ),
+                  const Divider(
+                    color: Colors.black54,
+                  ),
+                ],
               ),
-              ...lessons.map((lesson) => _buildLessonRow(
-                  lesson.name, lesson.subtitle, lesson.progress)),
-              const SizedBox(height: 15.0),
-            ],
-          ),
+            ),
+            ...lessons.map((lesson) => _buildLessonRow(lesson)),
+            const SizedBox(height: 15.0),
+          ],
         ),
       ),
     );
   }
 
-  ListTile _buildLessonRow(
-      String lessonName, String lessonSubtitle, double progress) {
+  ListTile _buildLessonRow(Lesson lesson) {
     return ListTile(
       onTap: () {
         Navigator.pushNamed(
           context,
           Routes.lesson,
-          arguments: lessonName,
+          arguments: lesson,
         );
       },
       contentPadding:
@@ -132,32 +128,28 @@ class _DetailPageState extends State<DetailPage> {
       leading: Padding(
         padding: const EdgeInsets.only(top: 8.0),
         child: Icon(
-          progress >= 1.0
+          lesson.progress >= 1.0
               ? FontAwesomeIcons.checkCircle
               : FontAwesomeIcons.circle,
           size: 24.0,
-          color: progress >= 1.0 ? Colors.green : Colors.black54,
+          color: lesson.progress >= 1.0 ? Colors.green : Colors.black54,
         ),
       ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            lessonName,
+            lesson.title,
             style: const TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 4.0),
-          Text(
-            lessonSubtitle,
-            style: const TextStyle(color: Colors.black54, fontSize: 14.0),
-          ),
           const SizedBox(height: 8.0),
           LinearProgressIndicator(
-            value: progress, // Puedes ajustar este valor según el progreso real
+            value: lesson
+                .progress, // Puedes ajustar este valor según el progreso real
             backgroundColor: Colors.grey.shade300,
             valueColor: AlwaysStoppedAnimation<Color>(
-              progress >= 1.0 ? Colors.green : Colors.blue,
+              lesson.progress >= 1.0 ? Colors.green : Colors.blue,
             ),
           ),
         ],
@@ -193,7 +185,7 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  Row _buildHeader(String name, IconData icon, Color color) {
+  Row _buildHeader(String name, String icon, Color color) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -201,11 +193,8 @@ class _DetailPageState extends State<DetailPage> {
         CircleAvatar(
           radius: 40,
           backgroundColor: Colors.grey.shade200,
-          child: Icon(
-            icon,
-            size: 40,
-            color: color,
-          ),
+          child: DynamicIcons.getIconFromName(icon.toLowerCase(),
+              color: color, size: 40),
         ),
         const SizedBox(width: 20.0),
         Column(
@@ -239,86 +228,6 @@ class _DetailPageState extends State<DetailPage> {
           ),
         ),
         const SizedBox(width: 15.0),
-      ],
-    );
-  }
-}
-
-class Lesson {
-  final String name;
-  final String subtitle;
-  final double progress;
-
-  Lesson(this.name, this.subtitle, this.progress);
-}
-
-class HeaderWidget extends StatelessWidget {
-  final Widget? body;
-  final Widget? header;
-  final Color headerColor;
-  final Color backColor;
-
-  const HeaderWidget(
-      {super.key,
-      this.body,
-      this.header,
-      this.headerColor = Colors.white,
-      this.backColor = Colors.deepPurple});
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildBody();
-  }
-
-  Stack _buildBody() {
-    return Stack(
-      children: <Widget>[
-        Positioned(
-          right: 0,
-          top: 0,
-          width: 10,
-          height: 200,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-                color: backColor,
-                borderRadius:
-                    const BorderRadius.only(topLeft: Radius.circular(20.0))),
-          ),
-        ),
-        Positioned(
-          right: 0,
-          top: 100,
-          width: 50,
-          bottom: 0,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: backColor,
-            ),
-          ),
-        ),
-        Column(
-          children: <Widget>[
-            if (header != null)
-              Container(
-                  margin: const EdgeInsets.only(right: 10.0),
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
-                        bottomRight: Radius.circular(20.0)),
-                    color: headerColor,
-                  ),
-                  child: header),
-            if (body != null)
-              Expanded(
-                child: Material(
-                    shape: const RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.only(topLeft: Radius.circular(30.0))),
-                    elevation: 0,
-                    color: backColor,
-                    child: body),
-              ),
-          ],
-        ),
       ],
     );
   }

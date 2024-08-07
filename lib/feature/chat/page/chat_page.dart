@@ -39,7 +39,7 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
-  Future<void> _createLesson(String value) async {
+  Future<void> _createCourse(String value) async {
     try {
       bool valor = await GeminiService.isInappropiate(value);
       if (!valor) {
@@ -155,7 +155,7 @@ class _ChatPageState extends State<ChatPage> {
                           hintText: "¿Qué quieres aprender?",
                         ),
                         onSubmitted: (value) {
-                          _createLesson(value);
+                          _createCourse(value);
                           _controller.clear();
                         },
                       ),

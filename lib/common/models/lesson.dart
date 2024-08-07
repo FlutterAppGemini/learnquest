@@ -17,7 +17,7 @@ class Lesson {
     return Lesson(
       title: json['title'],
       content: json['content'],
-      progress: json['progress'],
+      progress: 0.0,
       game: Game.fromJson(json['game']),
     );
   }
