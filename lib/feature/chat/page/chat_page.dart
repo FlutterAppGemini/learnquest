@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:learnquest/common/models/course.dart';
 import 'package:learnquest/common/routes/routes.dart';
-import 'package:learnquest/feature/learning/page/learning_page.dart';
 import 'package:learnquest/service/gemini_service.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
@@ -65,7 +64,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     createTile(Learn learn) => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+          padding: const EdgeInsets.all(8.0),
           child: InkWell(
             onTap: () {
               Navigator.pushNamed(
@@ -74,109 +73,190 @@ class _ChatPageState extends State<ChatPage> {
                 arguments: learn,
               );
             },
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child:
-                      _buildWikiCategory(learn.icon, learn.name, learn.color),
-                ),
-              ],
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: learn.color.withOpacity(0.1),
+                    child: Icon(learn.icon, color: learn.color, size: 30),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          learn.name,
+                          style: TextStyle(
+                            color: learn.color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "10 hours, 19 lessons",
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        LinearProgressIndicator(
+                          value: 0.25,
+                          backgroundColor: Colors.grey[200],
+                          color: learn.color,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Icon(Icons.play_arrow, color: learn.color),
+                ],
+              ),
             ),
           ),
         );
 
-    final liste = SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: learn.map((l) => createTile(l)).toList(),
-        ),
-      ),
+    final lessonsList = ListView.builder(
+      itemCount: learn.length,
+      itemBuilder: (context, index) {
+        return createTile(learn[index]);
+      },
     );
 
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          ClipPath(
-            clipper: WaveClipper(),
-            child: Container(
-              height: 250,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Color.fromARGB(255, 91, 31, 165),
-                    Color.fromARGB(255, 153, 60, 211),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFFF5F7FA),
+                  Colors.white,
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
             ),
           ),
           Column(
             children: <Widget>[
-              const SizedBox(height: 40),
               Container(
-                margin: const EdgeInsets.symmetric(
-                  vertical: 8.0,
-                  horizontal: 16.0,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF7B1FA2),
+                      Color(0xFFD81B60),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                  ),
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(10.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 8.0,
-                  horizontal: 20.0,
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: TextField(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20.0,
+                    horizontal: 20.0,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 40),
+                      const Text(
+                        "Welcome to New",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Text(
+                        "Educourse",
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      TextField(
                         controller: _controller,
                         textInputAction: TextInputAction.send,
-                        decoration: const InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: 10.0,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 15.0,
                             horizontal: 20.0,
                           ),
-                          border: InputBorder.none,
-                          hintText: "¿Qué quieres aprender?",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          hintText: "Enter your Keyword",
+                          prefixIcon: IconButton(
+                            icon: const Icon(Icons.mic,
+                                color: Color.fromARGB(255, 1, 82, 173)),
+                            onPressed: () {
+                              // Lógica para escuchar voz
+                            },
+                          ),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.send,
+                                color: Color.fromARGB(255, 1, 82, 173)),
+                            onPressed: () {
+                              _createLesson(_controller.text);
+                              _controller.clear();
+                            },
+                          ),
                         ),
                         onSubmitted: (value) {
                           _createLesson(value);
                           _controller.clear();
                         },
                       ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0),
+                child: Row(
+                  children: [
+                    Text(
+                      "Course For You",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.mic),
-                      color: const Color.fromARGB(255, 1, 82, 173),
-                      onPressed: () {
-                        // Lógica para escuchar voz
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.send),
-                      color: const Color.fromARGB(255, 1, 82, 173),
-                      onPressed: () {},
-                    )
                   ],
                 ),
               ),
               Expanded(
-                child: liste,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: lessonsList,
+                ),
               ),
             ],
           ),
@@ -184,83 +264,6 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
-
-  Stack _buildWikiCategory(IconData icon, String label, Color color) {
-    return Stack(
-      children: <Widget>[
-        Container(
-          padding: const EdgeInsets.all(26.0),
-          alignment: Alignment.centerRight,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 2,
-                blurRadius: 5,
-                offset: const Offset(0, 3), // changes position of shadow
-              ),
-            ],
-          ),
-          child: Opacity(
-              opacity: 0.1,
-              child: Icon(
-                icon,
-                size: 40,
-                color: Colors.black,
-              )),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(
-                icon,
-                color: color,
-              ),
-              const SizedBox(height: 16.0),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              )
-            ],
-          ),
-        )
-      ],
-    );
-  }
-}
-
-class WaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.lineTo(0.0, size.height);
-
-    var firstEndPoint = Offset(size.width / 2, size.height - 30);
-    var firstControlPoint = Offset(size.width / 4, size.height - 53);
-    path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy,
-        firstEndPoint.dx, firstEndPoint.dy);
-    var secondEndPoint = Offset(size.width, size.height - 90);
-    var secondControlPoint = Offset(size.width * 3 / 4, size.height - 14);
-    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy,
-        secondEndPoint.dx, secondEndPoint.dy);
-
-    path.lineTo(size.width, size.height);
-    path.lineTo(size.width, 0);
-    path.close();
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }
 
 class Learn {
@@ -275,6 +278,16 @@ class Learn {
 }
 
 final List<Learn> learn = [
+  Learn(
+    'UX Designer\nfrom Scratch.',
+    Icons.design_services,
+    Colors.purple,
+  ),
+  Learn(
+    'Design Thinking\nThe Beginner',
+    Icons.lightbulb,
+    Colors.blue,
+  ),
   Learn(
     'Math',
     Icons.calculate,

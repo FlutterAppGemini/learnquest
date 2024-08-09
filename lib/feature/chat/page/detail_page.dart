@@ -1,325 +1,286 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:learnquest/common/routes/routes.dart';
-import 'package:learnquest/feature/chat/page/chat_page.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({super.key});
 
   @override
-  State<DetailPage> createState() => _DetailPageState();
+  _DetailPageState createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {
-  late bool _saveLearn;
-  late List<Lesson> lessons;
-  @override
-  void initState() {
-    super.initState();
-    _saveLearn = false;
-    lessons = [
-      Lesson("Lesson 4", "Advanced Algebra", 0.6),
-      Lesson("Lesson 3", "Geometry Basics", 1.0),
-      Lesson("Lesson 2", "Basic Algebra", 0.9),
-      Lesson("Lesson 1", "Introduction to Math", 1.0),
-    ];
-  }
+  List<LessonTile> lessonTiles = [
+    const LessonTile(
+      title: "Introduction",
+      description: "Variables allow user to hold ...",
+      progress: 1.0,
+    ),
+    const LessonTile(
+      title: "Introduction",
+      description: "Variables allow user to hold ...",
+      progress: 0.5,
+    ),
+    const LessonTile(
+      title: "Introduction",
+      description: "Variables allow user to hold ...",
+      progress: 0.2,
+    ),
+    const LessonTile(
+      title: "Introduction",
+      description: "Variables allow user to hold ...",
+      progress: 0.0,
+    ),
+  ];
 
-  void _addNewLesson() {
+  void addLessonTile() {
     setState(() {
-      int newLessonNumber = lessons.length + 1;
-      lessons.insert(0, Lesson("Lesson $newLessonNumber", "New Lesson", 0.0));
+      lessonTiles.insert(
+          0,
+          const LessonTile(
+            title: "New Lesson",
+            description: "New lesson description ...",
+            progress: 0.0,
+          ));
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final arguments = ModalRoute.of(context)!.settings.arguments;
-    if (arguments == null || arguments is! Learn) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed(Routes.error);
-      });
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    final learn = arguments;
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
-      ),
-      body: HeaderWidget(
-        header: _buildHeader(learn.name, learn.icon, learn.color),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0, top: 10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "Progress".toUpperCase(),
-                      style: const TextStyle(
-                          fontSize: 18.0, fontWeight: FontWeight.bold),
-                    ),
-                    const Divider(
-                      color: Colors.black54,
-                    ),
-                  ],
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF7B1FA2), Color(0xFFD81B60)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0)
+                      .copyWith(top: 24.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      PopupMenuButton<int>(
+                        icon: const Icon(Icons.more_vert, color: Colors.white),
+                        onSelected: (item) => onSelected(context, item),
+                        itemBuilder: (context) => [
+                          const PopupMenuItem<int>(
+                            height: 25,
+                            value: 0,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.delete,
+                                  size: 16,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text('Delete'),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              _buildProgressRow("Lessons",
-                  "${lessons.where((lesson) => lesson.progress >= 1.0).length}/${lessons.length}"),
-              _buildProgressRow("Questions correct", "50/60"),
-              _buildProgressRow("Questions incorrect", "10/60"),
-              const SizedBox(height: 30.0),
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Lessons".toUpperCase(),
-                          style: const TextStyle(
-                              fontSize: 18.0, fontWeight: FontWeight.bold),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 30),
+                      const Text(
+                        "UX Designer from Scratch.",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
-                        TextButton.icon(
-                          onPressed: _addNewLesson,
-                          icon: const Icon(Icons.add),
-                          label: const Text('Generate New Lesson'),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Basic guideline & tips & tricks for how to become a UX designer easily.",
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.grey.withOpacity(0.6),
+                            radius: 30,
+                            child: const Icon(
+                              FontAwesomeIcons.userAlt,
+                              size: 40,
+                              color: Colors.blue,
+                            ),
+                          ),
+                          const Spacer(),
+                          IconButton(
+                            icon: const Icon(Icons.bookmark_border_outlined,
+                                color: Colors.yellow, size: 40),
+                            onPressed: () {
+                              // Bookmark functionality here
+                            },
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(16)),
+                    ),
+                    child: Column(
+                      children: [
+                        const TabBar(
+                          labelColor: Colors.black,
+                          unselectedLabelColor: Colors.grey,
+                          indicatorColor: Color(0xFFB41672),
+                          indicatorWeight:
+                              3.0, // Thickness of the indicator line
+                          tabs: [
+                            Tab(text: "Playlist"),
+                            Tab(text: "Author"),
+                          ],
+                        ),
+                        Expanded(
+                          child: TabBarView(
+                            children: [
+                              SingleChildScrollView(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "Playlist",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        ElevatedButton.icon(
+                                          onPressed: addLessonTile,
+                                          icon: const Icon(Icons.add,
+                                              color: Colors.white),
+                                          label: const Text("Add",
+                                              style: TextStyle(
+                                                  color: Colors.white)),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color(0xFFB41672),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    ...lessonTiles,
+                                  ],
+                                ),
+                              ),
+                              const Center(child: Text('Author')),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    const Divider(
-                      color: Colors.black54,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-              ...lessons.map((lesson) => _buildLessonRow(
-                  lesson.name, lesson.subtitle, lesson.progress)),
-              const SizedBox(height: 15.0),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  ListTile _buildLessonRow(
-      String lessonName, String lessonSubtitle, double progress) {
-    return ListTile(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          Routes.lesson,
-          arguments: lessonName,
-        );
-      },
-      contentPadding:
-          const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      leading: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: Icon(
-          progress >= 1.0
-              ? FontAwesomeIcons.checkCircle
-              : FontAwesomeIcons.circle,
-          size: 24.0,
-          color: progress >= 1.0 ? Colors.green : Colors.black54,
-        ),
-      ),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            lessonName,
-            style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4.0),
-          Text(
-            lessonSubtitle,
-            style: const TextStyle(color: Colors.black54, fontSize: 14.0),
-          ),
-          const SizedBox(height: 8.0),
-          LinearProgressIndicator(
-            value: progress, // Puedes ajustar este valor según el progreso real
-            backgroundColor: Colors.grey.shade300,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              progress >= 1.0 ? Colors.green : Colors.blue,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Row _buildProgressRow(String label, String value) {
-    return Row(
-      children: <Widget>[
-        const SizedBox(width: 20.0),
-        Expanded(
-          flex: 2,
-          child: Text(
-            label,
-            style: const TextStyle(fontSize: 16.0, color: Colors.black),
-          ),
-        ),
-        const SizedBox(width: 10.0),
-        Expanded(
-          flex: 1,
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-            textAlign: TextAlign.right,
-          ),
-        ),
-        const SizedBox(width: 20.0),
-      ],
-    );
-  }
-
-  Row _buildHeader(String name, IconData icon, Color color) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        const SizedBox(width: 15.0),
-        CircleAvatar(
-          radius: 40,
-          backgroundColor: Colors.grey.shade200,
-          child: Icon(
-            icon,
-            size: 40,
-            color: color,
-          ),
-        ),
-        const SizedBox(width: 20.0),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              name,
-              style:
-                  const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4.0),
-            const Text(
-              "Created on: 01/01/2023", // Fecha de creación fija, puedes ajustarla dinámicamente
-              style: TextStyle(fontSize: 14.0, color: Colors.black54),
-            ),
-          ],
-        ),
-        const Spacer(),
-        InkWell(
-          onTap: () {
-            setState(() {
-              _saveLearn = !_saveLearn;
-            });
-          },
-          child: Icon(
-            _saveLearn
-                ? FontAwesomeIcons.solidBookmark
-                : FontAwesomeIcons.bookmark,
-            size: 30.0,
-            color: Colors.black54,
-          ),
-        ),
-        const SizedBox(width: 15.0),
-      ],
-    );
+  void onSelected(BuildContext context, int item) {
+    switch (item) {
+      case 0:
+        // Add delete functionality here
+        break;
+    }
   }
 }
 
-class Lesson {
-  final String name;
-  final String subtitle;
+class LessonTile extends StatelessWidget {
+  final String title;
+  final String description;
   final double progress;
 
-  Lesson(this.name, this.subtitle, this.progress);
-}
-
-class HeaderWidget extends StatelessWidget {
-  final Widget? body;
-  final Widget? header;
-  final Color headerColor;
-  final Color backColor;
-
-  const HeaderWidget(
-      {super.key,
-      this.body,
-      this.header,
-      this.headerColor = Colors.white,
-      this.backColor = Colors.deepPurple});
+  const LessonTile({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.progress,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return _buildBody();
-  }
-
-  Stack _buildBody() {
-    return Stack(
-      children: <Widget>[
-        Positioned(
-          right: 0,
-          top: 0,
-          width: 10,
-          height: 200,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-                color: backColor,
-                borderRadius:
-                    const BorderRadius.only(topLeft: Radius.circular(20.0))),
-          ),
-        ),
-        Positioned(
-          right: 0,
-          top: 100,
-          width: 50,
-          bottom: 0,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: backColor,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6.0,
+              spreadRadius: 2.0,
             ),
-          ),
-        ),
-        Column(
-          children: <Widget>[
-            if (header != null)
-              Container(
-                  margin: const EdgeInsets.only(right: 10.0),
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
-                        bottomRight: Radius.circular(20.0)),
-                    color: headerColor,
-                  ),
-                  child: header),
-            if (body != null)
-              Expanded(
-                child: Material(
-                    shape: const RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.only(topLeft: Radius.circular(30.0))),
-                    elevation: 0,
-                    color: backColor,
-                    child: body),
-              ),
           ],
         ),
-      ],
+        child: Column(
+          children: [
+            ListTile(
+              leading: Icon(
+                progress == 1.0 ? Icons.check_circle : Icons.play_circle_fill,
+                color: progress == 1.0 ? Colors.green : const Color(0xFFB41672),
+                size: 32,
+              ),
+              title: Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(description),
+            ),
+            LinearProgressIndicator(
+              value: progress,
+              backgroundColor: Colors.grey[200],
+              color: const Color(0xFFB41672),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

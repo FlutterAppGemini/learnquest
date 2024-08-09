@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:learnquest/common/models/course.dart';
+import 'package:learnquest/common/models/game.dart';
+import 'package:learnquest/common/models/lesson.dart';
+import 'package:learnquest/common/models/question.dart';
 import 'package:learnquest/feature/chat/page/chat_page.dart';
-import 'package:learnquest/feature/home/components/bottom_nav_item.dart';
 import 'package:learnquest/feature/learning/page/learning_page.dart';
 import 'package:learnquest/feature/profile/page/profile_page.dart';
 import 'package:learnquest/feature/loading_overlay.dart';
@@ -16,7 +18,76 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _isLoading = false;
   int _selectedIndex = 1;
-  List<Course> courses = [];
+  List<Course> courses = [
+    Course(
+        title: 'title',
+        icon: 'add',
+        color: Colors.red,
+        description: 'description',
+        lessons: [
+          Lesson(
+              title: 'title',
+              content: 'content',
+              progress: 0.9,
+              game: Game(type: Type.write, data: [
+                Question(
+                    question: 'question',
+                    response: ['dsad', 'dsada'],
+                    solution: 'solution')
+              ]))
+        ]),
+    Course(
+        title: 'title',
+        icon: 'add',
+        color: Colors.red,
+        description: 'description',
+        lessons: [
+          Lesson(
+              title: 'title',
+              content: 'content',
+              progress: 0.9,
+              game: Game(type: Type.write, data: [
+                Question(
+                    question: 'question',
+                    response: ['dsad', 'dsada'],
+                    solution: 'solution')
+              ]))
+        ]),
+    Course(
+        title: 'title',
+        icon: 'add',
+        color: Colors.red,
+        description: 'description',
+        lessons: [
+          Lesson(
+              title: 'title',
+              content: 'content',
+              progress: 0.9,
+              game: Game(type: Type.write, data: [
+                Question(
+                    question: 'question',
+                    response: ['dsad', 'dsada'],
+                    solution: 'solution')
+              ]))
+        ]),
+    Course(
+        title: 'title',
+        icon: 'add',
+        color: Colors.red,
+        description: 'description',
+        lessons: [
+          Lesson(
+              title: 'title',
+              content: 'content',
+              progress: 0.9,
+              game: Game(type: Type.write, data: [
+                Question(
+                    question: 'question',
+                    response: ['dsad', 'dsada'],
+                    solution: 'solution')
+              ]))
+        ])
+  ];
   final PageController _pageController = PageController(initialPage: 1);
 
   void _onItemTapped(int index) {
@@ -59,92 +130,70 @@ class _HomePageState extends State<HomePage> {
               const ProfilePage(),
             ],
           ),
-          bottomNavigationBar: AnimatedBottomNav(
-            currentIndex: _selectedIndex,
-            onChange: _onItemTapped,
-          ),
-          floatingActionButton: GestureDetector(
-            onTap: () {
-              _onItemTapped(1);
-            },
-            child: Container(
-              width: 56.0,
-              height: 56.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [
-                    Color(0xFF8E44AD),
-                    Color(0xFFBB8FCE),
-                  ],
-                  begin: Alignment.bottomRight,
-                  end: Alignment.bottomLeft,
+          bottomNavigationBar: Container(
+            height: kToolbarHeight,
+            margin:
+                const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(30.0),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10.0,
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    spreadRadius: 3,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                const Spacer(),
+                IconButton(
+                  onPressed: () => _onItemTapped(0),
+                  icon: Icon(
+                    Icons.book,
+                    color: _selectedIndex == 0 ? Colors.purple : Colors.grey,
                   ),
-                ],
-              ),
-              child: const Icon(
-                Icons.add,
-                color: Colors.white,
-              ),
+                ),
+                const Spacer(),
+                Container(
+                  width: 56.0,
+                  height: 56.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.purple,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius: 3,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.add, color: Colors.white),
+                    onPressed: () {
+                      _onItemTapped(1);
+                    },
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => _onItemTapped(2),
+                  icon: Icon(
+                    Icons.person,
+                    color: _selectedIndex == 2 ? Colors.purple : Colors.grey,
+                  ),
+                ),
+                const Spacer(),
+              ],
             ),
           ),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerDocked,
         ),
         LoadingOverlay(isLoading: _isLoading),
       ],
-    );
-  }
-}
-
-class AnimatedBottomNav extends StatelessWidget {
-  final int currentIndex;
-  final Function(int) onChange;
-
-  const AnimatedBottomNav(
-      {super.key, required this.currentIndex, required this.onChange});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: kToolbarHeight,
-      decoration: const BoxDecoration(color: Colors.white),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: InkResponse(
-              onTap: () => onChange(0),
-              highlightColor: Colors.transparent,
-              splashColor: Colors.transparent,
-              child: BottomNavItem(
-                icon: Icons.book,
-                title: "Learning",
-                isActive: currentIndex == 0,
-              ),
-            ),
-          ),
-          const SizedBox(width: 40),
-          Expanded(
-            child: InkResponse(
-              onTap: () => onChange(2),
-              highlightColor: Colors.transparent,
-              splashColor: Colors.transparent,
-              child: BottomNavItem(
-                icon: Icons.person,
-                title: "Profile",
-                isActive: currentIndex == 2,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

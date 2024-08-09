@@ -52,6 +52,7 @@ dependencies:
   dynamic_icons: ^1.0.0
   quickalert: ^1.1.0
   flutter_custom_clippers: ^2.1.0
+  fl_chart: ^0.68.0
 
 dev_dependencies:
   flutter_test:

@@ -10,13 +10,12 @@ class LearningNoContent extends StatefulWidget {
 class _LearningNoContentState extends State<LearningNoContent> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: const Center(
+    return const Scaffold(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Aún no ha generado ninguna lección'),
+            Text('Aún no ha guardado ninguna lección'),
             SizedBox(height: 20),
             Image(
               image: NetworkImage('https://i.ibb.co/Kywy7pR/no-content.png'),
