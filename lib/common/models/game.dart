@@ -13,8 +13,7 @@ class Game {
 
   factory Game.fromJson(Map<String, dynamic> json) {
     return Game(
-      type:
-          Type.values.firstWhere((e) => e.toString() == 'Type.${json['type']}'),
+      type: _typeFromString(json['type']),
       data: (json['data'] as List).map((i) => Question.fromJson(i)).toList(),
     );
   }
@@ -24,5 +23,16 @@ class Game {
       'type': type.toString().split('.').last,
       'data': data.map((i) => i.toJson()).toList(),
     };
+  }
+
+  static Type _typeFromString(String type) {
+    switch (type) {
+      case 'write':
+        return Type.write;
+      case 'selection':
+        return Type.selection;
+      default:
+        throw Exception('Unknown type: $type');
+    }
   }
 }

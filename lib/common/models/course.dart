@@ -20,7 +20,7 @@ class Course {
     return Course(
       title: json['title'],
       icon: json['icon'],
-      color: Color(json['color']),
+      color: Color(int.parse(json['color'], radix: 16) + 0xFF000000),
       description: json['description'],
       lessons:
           (json['lessons'] as List).map((i) => Lesson.fromJson(i)).toList(),

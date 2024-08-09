@@ -1,5 +1,11 @@
+import 'package:dynamic_icons/dynamic_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:learnquest/common/models/course.dart';
+import 'package:learnquest/common/models/lesson.dart';
+import 'package:learnquest/common/routes/routes.dart';
+import 'package:learnquest/feature/chat/page/chat_page.dart';
+import 'package:learnquest/service/gemini_service.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({super.key});
@@ -9,6 +15,13 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
+  late bool _saveLearn;
+  @override
+  void initState() {
+    super.initState();
+    _saveLearn = false;
+  }
+
   List<LessonTile> lessonTiles = [
     const LessonTile(
       title: "Introduction",
